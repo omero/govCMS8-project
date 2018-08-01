@@ -21,12 +21,21 @@
         }
     ],
     "require": {
+        "composer/installers": "^1.2",
         "cweagans/composer-patches": "^1.6",
         "drupal-composer/drupal-scaffold": "^2.5",
-        "govcms/govcms": "~1.0"
+        "govcms/govcms": "~1.0",
+        "vlucas/phpdotenv": "^2.5",
+        "webflo/drupal-finder": "^1.0.0",
+        "webmozart/path-util": "^2.3"
     },
     "require-dev": {
-        "drush/drush": "^9.0"
+        "drush/drush": "^9.0",
+        "drupal/console": "^1.0.3",
+        "webflo/drupal-core-require-dev": "~8.4.3"
+    },
+    "conflict": {
+        "drupal/drupal": "*"
     },
     "extra": {
         "installer-types": ["bower-asset", "npm-asset"],
@@ -40,14 +49,32 @@
             "docroot/libraries/{$name}": ["type:drupal-library", "type:bower-asset", "type:npm-asset"],
             "drush/contrib/{$name}": ["type:drupal-drush"]
         },
-        "enable-patching": true
+        "enable-patching": true,
+        "drupal-scaffold": {
+            "initial": {
+                ".editorconfig": "../.editorconfig",
+                ".gitattributes": "../.gitattributes"
+            }
+        }
     },
     "config": {
         "bin-dir": "bin/",
         "sort-packages": true,
         "optimize-autoloader": true
     },
+    "autoload": {
+        "classmap": [
+            "scripts/composer/ScriptHandler.php"
+        ],
+        "files": ["load.environment.php"]
+    },
     "scripts": {
+        "pre-install-cmd": [
+            "DrupalProject\\composer\\ScriptHandler::checkComposerVersion"
+        ],
+        "pre-update-cmd": [
+            "DrupalProject\\composer\\ScriptHandler::checkComposerVersion"
+        ],
         "post-install-cmd": "DrupalComposer\\DrupalScaffold\\Plugin::scaffold",
         "post-update-cmd": "DrupalComposer\\DrupalScaffold\\Plugin::scaffold",
         "nuke": "rm -r -f bin docroot vendor composer.lock"
